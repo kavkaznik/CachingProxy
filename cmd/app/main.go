@@ -4,6 +4,7 @@ import (
 	"flag"
 	"io"
 	"log"
+	"main/internal/repository"
 	"net/http"
 )
 
@@ -11,6 +12,8 @@ var port int
 var url string
 
 func main() {
+	repository.Test()
+	return
 	flag.IntVar(&port, "port", 0, "port for url")
 	flag.StringVar(&url, "origin", "localhost", "request address")
 	flag.Parse()
