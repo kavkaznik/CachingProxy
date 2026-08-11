@@ -2,9 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
-	"io"
-	"net/http"
 	"time"
 
 	redis "github.com/redis/go-redis/v9"
@@ -25,25 +22,20 @@ func (r *Repo) Set(url string, response []byte) error {
 	return err
 }
 
-func (r *Repo) Get(url string) ([]byte, error, string) {
+func (r *Repo) Get(url string) ([]byte, error) {
 	val, err := r.client.Get(ctx, url).Bytes()
 	if err != nil {
-		if errors.Is(err, redis.Nil) {
-			body, err := httpRequest(url)
-			if err != nil {
-				return []byte{}, err, ""
-			} else {
-				return body, nil, ""
-			}
-		} else {
-			return []byte{}, err, ""
-		}
+
+		// if errors.Is(err, redis.Nil) "redis: nil"
+
+		return []byte{}, err
+
 	} else {
-		return val, nil, "cache"
+		return val, nil
 	}
 
 }
-func NewRepo() *Repo {
+func New() *Repo {
 	client := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "",
@@ -52,14 +44,4 @@ func NewRepo() *Repo {
 	return &Repo{
 		client: client,
 	}
-}
-
-func httpRequest(url string) ([]byte, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return []byte{}, nil
-	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	return body, err
 }
