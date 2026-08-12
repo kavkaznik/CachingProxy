@@ -18,7 +18,7 @@ func (r *Repo) Set(url string, response []byte) error {
 		ctx,
 		url,
 		response,
-		10*time.Minute).Err()
+		10*time.Second).Err()
 	return err
 }
 

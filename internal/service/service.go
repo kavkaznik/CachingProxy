@@ -1,8 +1,8 @@
 package service
 
 import (
-	"fmt"
 	"io"
+	e "main/internal/entities"
 	"net/http"
 )
 
@@ -10,6 +10,7 @@ type Repositorer interface {
 	Get(string) ([]byte, error)
 	Set(string, []byte) error
 }
+
 type Service struct {
 	Repo Repositorer
 }
@@ -22,37 +23,49 @@ func New(r Repositorer) *Service {
 
 //error "redis: nil"
 
-func (s *Service) Get(url string) ([]byte, error) {
+func (s *Service) Get(url string) (*e.MyRespond, error) {
 	resp, err := s.Repo.Get(url)
 	if err != nil {
 		if err.Error() == "redis: nil" {
 			res, er := httpRequest(url)
 			if er != nil {
-				return []byte{}, er
+				return res, er
 			} else {
-				err := s.Repo.Set(url, res)
+				bytes, err := res.Encode()
 				if err != nil {
-					return []byte{}, err
+					return res, err
+				}
+				err = s.Repo.Set(url, bytes)
+				if err != nil {
+					return res, err
 				} else {
-					fmt.Println("miss")
+					res.Miss()
 					return res, nil
 				}
 			}
 		} else {
-			return []byte{}, err
+			return nil, err
 		}
 	} else {
-		fmt.Println("hit")
-		return resp, nil
+		mr := e.NewMyRespond()
+		err = mr.Decode(resp)
+		mr.Hit()
+		return mr, err
 	}
 }
 
-func httpRequest(url string) ([]byte, error) {
+func httpRequest(url string) (*e.MyRespond, error) {
+	mr := e.NewMyRespond()
 	resp, err := http.Get(url)
 	if err != nil {
-		return []byte{}, nil
+		return mr, err
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
-	return body, err
+	if err != nil {
+		return mr, err
+	}
+	mr.Body = body
+	mr.Header = resp.Header
+	return mr, err
 }

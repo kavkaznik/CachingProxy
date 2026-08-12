@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
-	"io"
+	"fmt"
 	"log"
+	"main/internal/router"
 	"net/http"
 )
 
@@ -11,25 +12,12 @@ var port int
 var url string
 
 func main() {
-	flag.IntVar(&port, "port", 0, "port for url")
-	flag.StringVar(&url, "origin", "localhost", "request address")
+	flag.IntVar(&port, "port", 8081, "port for url")
+	flag.StringVar(&url, "origin", "iana.org", "request address")
 	flag.Parse()
 
-	http.HandleFunc("/", mo)
-
-	err := http.ListenAndServe("localhost:8081", nil)
+	rout := router.NewRouter(url)
+	fmt.Printf("Starting proxy\nPort: %v\nOrigin address: %v\nProxy address: localhost:%v\n", port, url, port)
+	err := http.ListenAndServe(fmt.Sprintf("localhost:%v", port), rout)
 	log.Fatal(err)
-}
-
-func mo(w http.ResponseWriter, r *http.Request) {
-	resp, err := http.Get(url + r.URL.Path)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	w.Write(body)
 }
