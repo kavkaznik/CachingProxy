@@ -1,8 +1,9 @@
 package controller
 
 import (
-	e "main/internal/entities"
 	"net/http"
+
+	e "main/internal/entities"
 )
 
 type Servicer interface {

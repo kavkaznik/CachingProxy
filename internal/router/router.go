@@ -1,10 +1,11 @@
 package router
 
 import (
+	"net/http"
+
 	"main/internal/controller"
 	"main/internal/repository"
 	"main/internal/service"
-	"net/http"
 
 	"github.com/go-chi/chi"
 )

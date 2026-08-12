@@ -4,12 +4,15 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"main/internal/router"
 	"net/http"
+
+	"main/internal/router"
 )
 
-var port int
-var url string
+var (
+	port int
+	url  string
+)
 
 func main() {
 	flag.IntVar(&port, "port", 8081, "port for url")

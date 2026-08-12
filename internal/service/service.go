@@ -2,8 +2,9 @@ package service
 
 import (
 	"io"
-	e "main/internal/entities"
 	"net/http"
+
+	e "main/internal/entities"
 )
 
 type Repositorer interface {
@@ -21,7 +22,7 @@ func New(r Repositorer) *Service {
 	}
 }
 
-//error "redis: nil"
+// error "redis: nil"
 
 func (s *Service) Get(url string) (*e.MyRespond, error) {
 	resp, err := s.Repo.Get(url)

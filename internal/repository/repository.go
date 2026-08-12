@@ -25,16 +25,14 @@ func (r *Repo) Set(url string, response []byte) error {
 func (r *Repo) Get(url string) ([]byte, error) {
 	val, err := r.client.Get(ctx, url).Bytes()
 	if err != nil {
-
 		// if errors.Is(err, redis.Nil) "redis: nil"
 
 		return []byte{}, err
-
 	} else {
 		return val, nil
 	}
-
 }
+
 func New() *Repo {
 	client := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
