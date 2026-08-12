@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log"
 	"time"
 
 	redis "github.com/redis/go-redis/v9"
@@ -33,12 +34,18 @@ func (r *Repo) Get(url string) ([]byte, error) {
 	}
 }
 
-func New() *Repo {
+func New(clear bool) *Repo {
 	client := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "",
 		DB:       0,
 	})
+	if clear {
+		err := client.FlushAllAsync(ctx).Err()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 	return &Repo{
 		client: client,
 	}

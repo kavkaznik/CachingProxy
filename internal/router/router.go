@@ -10,8 +10,8 @@ import (
 	"github.com/go-chi/chi"
 )
 
-func NewRouter(url string) http.Handler {
-	rep := repository.New()
+func NewRouter(url string, clear bool) http.Handler {
+	rep := repository.New(clear)
 	ser := service.New(rep)
 	con := controller.NewRequestHandler(ser, url)
 	r := chi.NewRouter()
